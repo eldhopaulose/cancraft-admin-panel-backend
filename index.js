@@ -1,16 +1,27 @@
-var express = require('express');
-var bodyParser = require('body-parser');
-var app = express();
-var adminRouter = require('./routes/adminRoutes');
+const express = require("express");
+const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
+require("dotenv").config();
+const adminAuthRoutes = require("./routes/adminAuthRoutes");
 
-app.use(bodyParser.json()); 
+const app = express();
 
-app.use('/api/admin', adminRouter); 
+app.use(bodyParser.json());
 
-app.get('/', function (req, res) {
-    res.send('welcome to cancraft admin panel backend!');
-})
+app.use("/api/admin", adminAuthRoutes);
 
-app.listen(3000, function () {
-    console.log('Server is running on port 3000');
+app.get("/", function (req, res) {
+  res.send("welcome to cancraft admin panel backend!");
 });
+
+mongoose
+  .connect(process.env.MONG_URI)
+  .then(() => {
+    // listen for requests
+    app.listen(process.env.PORT, () => {
+      console.log("connected to db & listening on port", process.env.PORT);
+    });
+  })
+  .catch((error) => {
+    console.log(error);
+  });
